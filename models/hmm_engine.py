@@ -78,26 +78,32 @@ class HMMEngine:
         # Feature 1: Returns
         df['Returns'] = df['Close'].pct_change()
 
-        # Feature 2: Range
+        # Feature 2: Range (normalized price range)
         df['Range'] = (df['High'] - df['Low']) / df['Close']
 
-        # Feature 3: Volume Volatility
-        df['Volume_Returns'] = df['Volume'].pct_change()
-        df['Volume_Volatility'] = df['Volume_Returns'].rolling(window=20).std()
+        # Feature 3: Volume Ratio (more robust than volatility)
+        # Use rolling mean instead of volatility to handle zero volumes better
+        df['Volume_MA'] = df['Volume'].rolling(window=20, min_periods=1).mean()
+        # Avoid division by zero
+        df['Volume_Ratio'] = df['Volume'] / (df['Volume_MA'] + 1e-10)
 
-        # Drop NaN values
+        # Replace infinite values before dropna
+        df = df.replace([np.inf, -np.inf], np.nan)
+
+        # Drop only initial NaN values from pct_change
         df = df.dropna()
 
         # Extract feature columns
-        feature_cols = ['Returns', 'Range', 'Volume_Volatility']
+        feature_cols = ['Returns', 'Range', 'Volume_Ratio']
         features = df[feature_cols].values
+
+        # Final cleanup: replace any remaining NaN/Inf with reasonable values
+        features = np.nan_to_num(features, nan=0.0, posinf=1.0, neginf=0.0)
 
         # Validate features
         is_valid, issues = self.validator.validate_features(features, feature_cols)
         if not is_valid:
             logger.warning(f"Feature validation issues: {issues}")
-            # Handle NaN/Inf by replacing with 0
-            features = np.nan_to_num(features, nan=0.0, posinf=0.0, neginf=0.0)
 
         logger.info(f"Prepared {len(features)} samples with {features.shape[1]} features")
 

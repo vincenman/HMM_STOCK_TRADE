@@ -61,6 +61,12 @@ class DataLoader:
         if start_date is None:
             start_date = end_date - timedelta(days=LOOKBACK_DAYS)
 
+        # Ensure dates are timezone-naive for consistency
+        if hasattr(end_date, 'tzinfo') and end_date.tzinfo is not None:
+            end_date = end_date.replace(tzinfo=None)
+        if hasattr(start_date, 'tzinfo') and start_date.tzinfo is not None:
+            start_date = start_date.replace(tzinfo=None)
+
         logger.info(f"Fetching data from {start_date} to {end_date}")
 
         # Try to load from cache first
@@ -71,10 +77,19 @@ class DataLoader:
 
                 # Check if we need to fetch additional recent data
                 latest_cached = cached_data.index.max()
+                # Make latest_cached timezone-naive for comparison
+                if hasattr(latest_cached, 'tzinfo') and latest_cached.tzinfo is not None:
+                    latest_cached = latest_cached.replace(tzinfo=None)
                 if (end_date - latest_cached).total_seconds() > 3600:  # More than 1 hour old
                     logger.info("Cache is stale, fetching recent data")
                     recent_data = self._fetch_from_api(latest_cached, end_date)
                     if recent_data is not None and len(recent_data) > 0:
+                        # Ensure both DataFrames have same timezone (convert to UTC)
+                        if cached_data.index.tzinfo is None:
+                            cached_data.index = cached_data.index.tz_localize('UTC')
+                        if recent_data.index.tzinfo is None:
+                            recent_data.index = recent_data.index.tz_localize('UTC')
+
                         # Combine cached and recent data
                         cached_data = pd.concat([cached_data, recent_data])
                         cached_data = cached_data[~cached_data.index.duplicated(keep='last')]
