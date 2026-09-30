@@ -1,4 +1,5 @@
 """
 Package initialization for backtesting module.
 """
-# Backtesting module - Phase 2
+from .backtester import Backtester
+from .performance import PerformanceMetrics
