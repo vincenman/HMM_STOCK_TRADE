@@ -26,3 +26,6 @@ colorlog>=6.7.0
 # Utilities
 python-dateutil>=2.8.0
 pytz>=2023.3
+
+# Phase 4: Paper Trading & Reports
+reportlab>=4.0.0  # PDF report generation

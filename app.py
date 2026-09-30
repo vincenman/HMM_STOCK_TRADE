@@ -151,7 +151,7 @@ if not st.session_state.data_loaded:
 
 else:
     # Create tabs
-    tab1, tab2, tab3, tab4 = st.tabs(["📈 Overview", "📊 Backtest Results", "⚙️ Configuration", "ℹ️ About"])
+    tab1, tab2, tab3, tab4, tab5 = st.tabs(["📈 Overview", "📊 Backtest Results", "📡 Paper Trading", "⚙️ Configuration", "ℹ️ About"])
 
     with tab1:
         st.header("Market Overview")
@@ -252,10 +252,22 @@ else:
             st.info("👈 Run a backtest from the sidebar to see results")
 
     with tab3:
+        st.header("Paper Trading (Live Simulation)")
+
+        # Import paper trading page
+        from ui.pages.paper_trading import render_paper_trading_page
+
+        # Render paper trading interface
+        render_paper_trading_page(
+            model_engine=st.session_state.get('engine'),
+            historical_data=st.session_state.get('data')
+        )
+
+    with tab4:
         st.header("Strategy Configuration")
         render_config_panel()
 
-    with tab4:
+    with tab5:
         st.header("About This Dashboard")
         st.markdown("""
         ### 🎯 HMM Regime-Based Trading System
