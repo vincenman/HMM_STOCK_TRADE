@@ -1,15 +1,36 @@
+# Streamlit Cloud Configuration
+# This file configures the app for deployment on Streamlit Cloud
+
+[server]
+# Streamlit server settings
+headless = true
+port = 8501
+enableCORS = false
+enableXsrfProtection = true
+
+[browser]
+# Browser settings
+gatherUsageStats = false
+serverAddress = "0.0.0.0"
+
 [theme]
+# App theme
 primaryColor = "#1f77b4"
 backgroundColor = "#ffffff"
 secondaryBackgroundColor = "#f0f2f6"
 textColor = "#262730"
 font = "sans serif"
 
-[server]
-headless = true
-port = 8502
-enableCORS = true
-enableXsrfProtection = true
+[client]
+# Client settings
+showErrorDetails = true
+toolbarMode = "minimal"
 
-[browser]
-gatherUsageStats = false
+[runner]
+# Runner settings
+magicEnabled = true
+fastReruns = true
+
+[logger]
+# Logging
+level = "info"

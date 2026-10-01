@@ -1,0 +1,14 @@
+# System packages needed for Streamlit Cloud
+# These are installed before Python packages
+
+# For scientific computing
+build-essential
+gcc
+g++
+gfortran
+libopenblas-dev
+liblapack-dev
+
+# For PDF generation (reportlab)
+libjpeg-dev
+zlib1g-dev
